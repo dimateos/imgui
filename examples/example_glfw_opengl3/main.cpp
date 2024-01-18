@@ -170,6 +170,13 @@ int main(int, char**)
             ImGui::End();
         }
 
+        // TEST ISSUE CODE: includes vscode tasks, etc -> open issue/PR without those
+        {
+            ImGui::Begin("TEST ISSUE");
+            ImGui::Button("Button");
+            ImGui::End();
+        }
+
         // Rendering
         ImGui::Render();
         int display_w, display_h;

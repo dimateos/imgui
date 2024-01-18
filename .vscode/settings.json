@@ -1,0 +1,12 @@
+{
+    "workbench.colorTheme": "Gatito Theme",
+
+    "env": {
+        "cmd_fix": "start /b cmd /c", // fix command scaping strings etc
+
+        "path": {
+            "msvc_tools": "C:/Program Files/Microsoft Visual Studio/2022/Professional/VC/Auxiliary/Build/vcvars64.bat",
+            "msvc_platform": "/p:WindowsTargetPlatformVersion=10.0.19041.0"
+        }
+    },
+}
