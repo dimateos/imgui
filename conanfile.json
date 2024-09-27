@@ -1,0 +1,26 @@
+{
+    "name": "imgui",
+    "version": "1.0.0",
+
+    //"skip" : true,
+    //"use_intel" : true,
+
+    "configurations": [
+        {
+            "sources": {
+                "folders": ["./"],
+                "included":  [
+                    "examples/example_glfw_opengl3/main.cpp; backends/imgui_impl_glfw.cpp; backends/imgui_impl_opengl3.cpp;",
+                    "imgui.cpp; imgui_demo.cpp; imgui_draw.cpp; imgui_tables.cpp; imgui_widgets.cpp;"
+                ],
+            },
+            "values": {
+                "INCLUDE_DIRS": [
+                    "./", "backends", "examples/libs/glfw/include",
+                ],
+                "LIB_DIRS": "examples/libs/glfw/lib-vc2010-32",
+                "LIBS": [ "glfw3.lib; opengl32.lib; gdi32.lib; shell32.lib" ],
+            }
+        },
+    ]
+}
