@@ -12,8 +12,24 @@ namespace ImScoped
         //Base(Base&&) = default;                 \
         //Base& operator=(Base&&) = default;
 
-    struct Window
+    class NonCopyable
     {
+        public:
+        NonCopyable() = default;
+        ~NonCopyable() = default;
+
+        // Delete copy constructor and assignment operator
+        NonCopyable(const NonCopyable&) = delete;
+        NonCopyable& operator=(const NonCopyable&) = delete;
+
+        // Default move constructor and assignment operator
+        NonCopyable(NonCopyable&&) = default;
+        NonCopyable& operator=(NonCopyable&&) = default;
+    };
+
+    class Window : public NonCopyable
+    {
+        public:
         bool IsContentVisible;
 
         // Constructor
@@ -30,27 +46,31 @@ namespace ImScoped
             std::cout << "Window destructor" << std::endl;
         }
 
-        // Move constructor
-        Window(Window&& other) noexcept
-        {
-            IsContentVisible = other.IsContentVisible;
-            std::cout << "Window move constructor" << std::endl;
-        }
-
-        // Move assignment operator
-        Window& operator=(Window&& other) noexcept
-        {
-            std::cout << "Window move assignment operator... maybe" << std::endl;
-            if (this != &other) {
-                IsContentVisible = other.IsContentVisible;
-                std::cout << "Window move assignment operator... YEP" << std::endl;
-            }
-            return *this;
-        }
-
         explicit operator bool() const { return IsContentVisible; }
 
-        IMGUI_DELETE_MOVE_COPY(Window);
+        // Default move constructor and assignment operator
+        Window(Window&&) = default;
+        Window& operator=(Window&&) = default;
+
+        //// Move constructor
+        //Window(Window&& other) noexcept
+        //{
+        //    IsContentVisible = other.IsContentVisible;
+        //    std::cout << "Window move constructor" << std::endl;
+        //}
+
+        //// Move assignment operator
+        //Window& operator=(Window&& other) noexcept
+        //{
+        //    std::cout << "Window move assignment operator... maybe" << std::endl;
+        //    if (this != &other) {
+        //        IsContentVisible = other.IsContentVisible;
+        //        std::cout << "Window move assignment operator... YEP" << std::endl;
+        //    }
+        //    return *this;
+        //}
+
+        //IMGUI_DELETE_MOVE_COPY(Window);
     };
 
     struct Child
