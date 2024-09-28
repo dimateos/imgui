@@ -17,6 +17,9 @@
 #endif
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
+// https://github.com/sethk/imgui/tree/raii/misc/cpp + modified for tests
+#include "imgui_scoped.h"
+
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
 // Your own project should not be affected, as you are likely to link with a newer binary of GLFW that is adequate for your version of Visual Studio.
@@ -173,6 +176,22 @@ int main(int, char**)
             if (ImGui::Button("Close Me"))
                 show_another_window = false;
             ImGui::End();
+        }
+
+        // 4. Test scoped
+        {
+            static bool show_test_window = true;
+            ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
+
+            if (show_test_window) {
+                //ImScoped::Window win("Test Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize); if (win) {
+                //auto win = ImScoped::Window("Test Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize); if (win) {
+                if (auto win = ImScoped::Window("Test Window", &show_test_window, ImGuiWindowFlags_AlwaysAutoResize)) {
+                    ImGui::Text("Hello");
+                    ImGui::Text("Bye...");
+                    show_test_window = false;
+                }
+            }
         }
 
         // Rendering
