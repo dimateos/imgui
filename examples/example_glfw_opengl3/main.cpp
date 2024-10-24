@@ -17,9 +17,6 @@
 #endif
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
-// https://github.com/sethk/imgui/tree/raii/misc/cpp + modified for tests
-#include "imgui_scoped.h"
-
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
 // Your own project should not be affected, as you are likely to link with a newer binary of GLFW that is adequate for your version of Visual Studio.
@@ -36,6 +33,10 @@ static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
+
+
+// test widgets etc
+#include "testing.cpp"
 
 // Main code
 int main(int, char**)
@@ -110,7 +111,7 @@ int main(int, char**)
     //IM_ASSERT(font != nullptr);
 
     // Our state
-    bool show_demo_window = true;
+    bool show_demo_window = true, show_demo = true;
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -142,10 +143,12 @@ int main(int, char**)
         ImGui::NewFrame();
 
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        if (show_demo_window)
+        if (show_demo && show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
 
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+        if (ImGui::IsKeyChordPressed(ImGuiMod_Ctrl | ImGuiKey_0)) show_demo ^= 1;
+        if (show_demo)
         {
             static float f = 0.0f;
             static int counter = 0;
@@ -169,7 +172,7 @@ int main(int, char**)
         }
 
         // 3. Show another simple window.
-        if (show_another_window)
+        if (show_demo && show_another_window)
         {
             ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
             ImGui::Text("Hello from another window!");
@@ -178,21 +181,8 @@ int main(int, char**)
             ImGui::End();
         }
 
-        // 4. Test scoped
-        {
-            static bool show_test_window = true;
-            ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
-
-            if (show_test_window) {
-                //ImScoped::Window win("Test Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize); if (win) {
-                //auto win = ImScoped::Window("Test Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize); if (win) {
-                if (auto win = ImScoped::Window("Test Window", &show_test_window, ImGuiWindowFlags_AlwaysAutoResize)) {
-                    ImGui::Text("Hello");
-                    ImGui::Text("Bye...");
-                    show_test_window = false;
-                }
-            }
-        }
+        // Testing...
+        test_scoped();
 
         // Rendering
         ImGui::Render();
