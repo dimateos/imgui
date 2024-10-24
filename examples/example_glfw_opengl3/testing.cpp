@@ -54,6 +54,7 @@ void test_combo_scroll(int k = 0, bool start_open = true)
     }
 
     // own the scroll over the window
+    ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelX);
     ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelY);
 
     // show hover
@@ -83,6 +84,68 @@ void test_combo_scroll(int k = 0, bool start_open = true)
         selected_item -= dir;
         if (selected_item < 0) selected_item = 0;
         else if (selected_item > items_size-1) selected_item = items_size-1;
+    }
+
+    // simlate scrollable
+    for (size_t i = 0; i < 10; i++) ImGui::TextDisabled("...");
+    ImGui::End();
+}
+
+// there could be one for floating, int, bool?
+bool ModifyItemValueByScroll(float *v, float scale = 1.0f, ImGuiHoveredFlags hoverFlags = 0) {
+    // issues:
+    // - sometimes scrolls even when the item is hovered?
+    // - ignores limits: only adjusted when the behavior is clicked not on hover
+    // - eats the is item hovered query
+
+    // own the scroll over the window (better before the hover query)
+    ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelX);
+    ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelY);
+
+    bool hovered = ImGui::IsItemHovered(hoverFlags);
+    if (!hovered) return false;
+    ImGui::BulletText("hovered... in");
+
+    float scroll_delta = ImGui::GetIO().MouseWheel; // both axis
+    if (scroll_delta == 0) return false;
+
+    // edit the value
+    *v -= scroll_delta * scale;
+    return true;
+}
+
+void test_value_scroll(int k = 0, bool start_open = true)
+{
+    static bool test_value_scroll_window = true;
+    if (ImGui::IsKeyChordPressed(ImGuiMod_Ctrl | k)) test_value_scroll_window ^= 1;
+    if (!test_value_scroll_window) return;
+
+    ImGui::SetNextWindowCollapsed(!start_open, ImGuiCond_Once);
+    std::string name = std::to_string(k-ImGuiKey_0) + ". test_value_scroll_window";
+    ImGui::Begin(name.c_str(), &test_value_scroll_window);
+
+    static float f = 0.0f;
+    static bool disabled = false, query2 = false;
+
+    ImGui::Checkbox("disabled", &disabled);
+    ImGui::Checkbox("query2", &query2);
+
+    // widget
+    if (disabled) ImGui::BeginDisabled();
+    //ImGui::SliderFloat("slider", &f, -100, 100);
+    //ImGui::DragFloat("drag", &f, 1.0f, -100, 100);
+    //ImGui::InputFloat("input", &f, 1.0f);
+    ImGui::TextWrapped("f: %f", f);
+    if (disabled) ImGui::EndDisabled();
+
+    ModifyItemValueByScroll(&f);
+
+    // the spawned text affects it!
+    if (query2 && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+        ImGui::BulletText("hovered... 2");
+    }
+    if (query2 && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+        ImGui::BulletText("hovered... 3");
     }
 
     // simlate scrollable
