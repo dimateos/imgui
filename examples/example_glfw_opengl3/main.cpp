@@ -111,7 +111,7 @@ int main(int, char**)
     //IM_ASSERT(font != nullptr);
 
     // Our state
-    bool show_demo_window = true, show_demo = true;
+    bool show_demo_window = true, show_demo = false;
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -183,8 +183,10 @@ int main(int, char**)
 
         // Testing...
         test();
-        test_scoped();
-        test_combo_scroll();
+        test_scoped(ImGuiKey_1, false);
+        test_combo_scroll(ImGuiKey_2, false);
+        test_value_scroll(ImGuiKey_3);
+        test_disabled_hover(ImGuiKey_4, false);
 
         // Rendering
         ImGui::Render();
