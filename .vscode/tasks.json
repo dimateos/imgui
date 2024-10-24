@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    // REF:: https://go.microsoft.com/fwlink/?LinkId=733558
+
+    // default props
+    "type": "shell",
+    "detail": "no details...",
+    "presentation": { "panel": "dedicated", "clear": true },
+    //"hide": false, "problemMatcher": [], "isBackground": true, "presentation": { "reveal": "never", "close": true }
+
+    "options": {
+        "cwd": "${workspaceFolder}\\examples",
+        "env": { }
+    },
+
+    "tasks": [
+        {
+            "label": "build",
+            "icon": { "id": "terminal-ubuntu", "color": "terminal.ansiBlue" },
+            "group": "build",
+
+            "command": "\"${config:env.path.msvc_tools}\" && msbuild ./example_glfw_opengl3/example_glfw_opengl3.vcxproj /t:Build /p:Configuration=Debug /p:Platform=x64 ${config:env.path.msvc_platform}",
+            "problemMatcher": "$msCompile",
+        },
+        {
+            "label": "clean",
+            "icon": { "id": "trash", "color": "terminal.ansiBlue" },
+
+            "command": "\"${config:env.path.msvc_tools}\" && msbuild ./example_glfw_opengl3/example_glfw_opengl3.vcxproj /t:Clean /p:Configuration=Debug /p:Platform=x64 ${config:env.path.msvc_platform}",
+            "problemMatcher": "$msCompile",
+        },
+    ]
+}
