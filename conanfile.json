@@ -18,9 +18,27 @@
                 "INCLUDE_DIRS": [
                     "./", "backends", "examples/libs/glfw/include",
                 ],
+            }
+        },
+
+        // split libs
+        {
+            "settings": {
+                "os": "Windows",
+            },
+            "values": {
                 "LIB_DIRS": "examples/libs/glfw/lib-vc2010-64",
                 "LIBS": [ "glfw3.lib; opengl32.lib; gdi32.lib; shell32.lib" ],
             }
         },
+        {
+            "settings": {
+                "os": "Linux",
+            },
+            "values": {
+                // installed in the system: sudo apt-get install libgl1-mesa-dev libglfw3-dev
+                "LIBS": [ "glfw; GL; dl; pthread" ],
+            }
+        }
     ]
 }
