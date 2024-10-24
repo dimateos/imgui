@@ -1,13 +1,43 @@
 // Sandbox tests
 #include "imgui.h"
 
+// clear id is internal, also breakpoint
+#include "imgui_internal.h"
+
 // cpp properties include paths
 //"${workspaceFolder}/Open-imgui/",
 //"${workspaceFolder}/Open-imgui/backends/",
 //"${workspaceFolder}/Open-imgui/examples/libs/glfw/include",
 
-// clear id is internal, also breakpoint
-#include "imgui_internal.h"
+#include <string>
+#include <iostream>
+
+
+// attemps on a debugger detector: nah
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <fstream>
+#endif
+
+bool util_IsDebuggerAttached() {
+#ifdef _WIN32
+    return IsDebuggerPresent() != 0;
+
+#elif defined(__linux__)
+    std::ifstream status_file("/proc/self/status");
+    std::string line;
+
+    // Non-zero TracerPid means a debugger is attached
+    while (std::getline(status_file, line)) {
+        if (line.find("TracerPid:") == 0) {
+            return line.find("0") == std::string::npos; // BUG:: not working
+        }
+    }
+
+#endif
+    return false; // Default to no debugger
+}
 
 
 // TMP:: anything
@@ -18,6 +48,7 @@ void test() {
 
     if (ImGui::IsKeyChordPressed(ImGuiKey_B)) {
         std::cout << "breakpoint (crashes with when debugger)" << std::endl;
+        //if (util_IsDebuggerAttached()) IM_DEBUG_BREAK();
         IM_DEBUG_BREAK();
     }
 }
@@ -40,6 +71,11 @@ void test_scoped(int k = 0, bool start_open = true)
         ImGui::Text("Hello");
         ImGui::Text("Bye...");
     }
+}
+
+void util_fill_scroll(size_t n = 10) {
+    ImGui::SeparatorText("fill");
+    for (size_t i = 0; i < n; i++) ImGui::TextDisabled("...");
 }
 
 // Scrolling on top a combo box like QT
@@ -96,13 +132,12 @@ void test_combo_scroll(int k = 0, bool start_open = true)
         else if (selected_item > items_size-1) selected_item = items_size-1;
     }
 
-    // simlate scrollable
-    for (size_t i = 0; i < 10; i++) ImGui::TextDisabled("...");
+    util_fill_scroll();
     ImGui::End();
 }
 
 // there could be one for floating, int, bool?
-bool ModifyItemValueByScroll(float *v, float scale = 1.0f, ImGuiHoveredFlags hoverFlags = 0) {
+bool util_ModifyItemValueByScroll(float *v, float scale = 1.0f, ImGuiHoveredFlags hoverFlags = 0) {
     // issues:
     // - ignores limits: only adjusted when the behavior is clicked not on hover
     // - eats the is item hovered query? nop issue arises when a new item is added before the next check
@@ -164,7 +199,7 @@ void test_value_scroll(int k = 0, bool start_open = true)
     ImGuiContext& g = *GImGui;
     int last = g.LastItemData.ID, hover = g.HoveredId, active = g.ActiveId;
 
-    ModifyItemValueByScroll(&f);
+    util_ModifyItemValueByScroll(&f);
 
     // the spawned text affects it?
     if (query2 && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -181,20 +216,19 @@ void test_value_scroll(int k = 0, bool start_open = true)
     // ALL
     ImGui::SeparatorText("ALL");
     ImGui::SliderFloat("slider", &f, -100, 100);
-    ModifyItemValueByScroll(&f);
+    util_ModifyItemValueByScroll(&f);
     ImGui::SliderFloat("slider2", &f, -100, 100);
-    ModifyItemValueByScroll(&f);
+    util_ModifyItemValueByScroll(&f);
     ImGui::DragFloat("drag", &f, 1.0f, -100, 100);
-    ModifyItemValueByScroll(&f);
+    util_ModifyItemValueByScroll(&f);
     ImGui::InputFloat("input", &f, 1.0f);
-    ModifyItemValueByScroll(&f);
+    util_ModifyItemValueByScroll(&f);
     ImGui::Text("f: %f", f);
-    ModifyItemValueByScroll(&f);
-    ModifyItemValueByScroll(&f);
+    util_ModifyItemValueByScroll(&f);
+    util_ModifyItemValueByScroll(&f);
 
     // simlate scrollable
-    ImGui::SeparatorText("fill");
-    for (size_t i = 0; i < 10; i++) ImGui::TextDisabled("...");
+    util_fill_scroll();
     ImGui::End();
 }
 
