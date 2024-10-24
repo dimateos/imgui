@@ -181,12 +181,15 @@ int main(int, char**)
             ImGui::End();
         }
 
+
         // Testing...
+        if (ImGui::IsKeyChordPressed(ImGuiKey_Escape)) glfwSetWindowShouldClose(window, GLFW_TRUE);
         test();
-        test_scoped(ImGuiKey_1, false);
+        //test_scoped(ImGuiKey_1, false);
         test_combo_scroll(ImGuiKey_2, false);
         test_value_scroll(ImGuiKey_3);
         test_disabled_hover(ImGuiKey_4, false);
+
 
         // Rendering
         ImGui::Render();

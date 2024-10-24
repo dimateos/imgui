@@ -6,12 +6,20 @@
 //"${workspaceFolder}/Open-imgui/backends/",
 //"${workspaceFolder}/Open-imgui/examples/libs/glfw/include",
 
+// clear id is internal, also breakpoint
+#include "imgui_internal.h"
+
 
 // TMP:: anything
 #include <iostream>
 #include <string>
 void test() {
-    //std::cout << "> cmd out hooked?" << std::endl;
+    //std::cout << "> std out" << std::endl;
+
+    if (ImGui::IsKeyChordPressed(ImGuiKey_B)) {
+        std::cout << "breakpoint (crashes with when debugger)" << std::endl;
+        IM_DEBUG_BREAK();
+    }
 }
 
 
@@ -59,7 +67,9 @@ void test_combo_scroll(int k = 0, bool start_open = true)
 
     // show hover
     auto combo_hover = ImGui::IsItemHovered();
-    if (combo_hover) ImGui::BulletText("Combo is hovered now...");
+    if (combo_hover) {
+        ImGui::BulletText("Combo is hovered now...");
+    }
 
     // show scroll
     float scroll_delta = ImGui::GetIO().MouseWheel;
@@ -94,20 +104,32 @@ void test_combo_scroll(int k = 0, bool start_open = true)
 // there could be one for floating, int, bool?
 bool ModifyItemValueByScroll(float *v, float scale = 1.0f, ImGuiHoveredFlags hoverFlags = 0) {
     // issues:
-    // - sometimes scrolls even when the item is hovered?
     // - ignores limits: only adjusted when the behavior is clicked not on hover
-    // - eats the is item hovered query
+    // - eats the is item hovered query? nop issue arises when a new item is added before the next check
 
-    // own the scroll over the window (better before the hover query)
-    ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelX);
-    ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelY);
+    // own the scroll over the window -> only for items, not texts!
+    //ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelX);
+    //ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelY);
 
     bool hovered = ImGui::IsItemHovered(hoverFlags);
     if (!hovered) return false;
-    ImGui::BulletText("hovered... in");
+    //ImGui::BulletText("hovered... in");
+
+    // own the scroll even for texts
+    //ImGuiContext& g = *GImGui;
+    //ImGuiID id = g.LastItemData.ID;
+    //ImGui::SetHoveredID(id);
+    //ImGui::SetKeyOwner(ImGuiKey_MouseWheelX, id);
+    //ImGui::SetKeyOwner(ImGuiKey_MouseWheelY, id);
+    // ID are ONLY commited by actual items, texts appear as g.LastItemData but with no ID -> IsItemHovered checks if its rect was touched
+    ImGui::SetKeyOwner(ImGuiKey_MouseWheelX, ImGuiKeyOwner_Any, ImGuiInputFlags_LockThisFrame);
+    ImGui::SetKeyOwner(ImGuiKey_MouseWheelY, ImGuiKeyOwner_Any, ImGuiInputFlags_LockThisFrame);
 
     float scroll_delta = ImGui::GetIO().MouseWheel; // both axis
     if (scroll_delta == 0) return false;
+
+    // stop interaction
+    if (ImGui::IsItemActive()) ImGui::ClearActiveID();
 
     // edit the value
     *v -= scroll_delta * scale;
@@ -132,23 +154,46 @@ void test_value_scroll(int k = 0, bool start_open = true)
 
     // widget
     if (disabled) ImGui::BeginDisabled();
-    //ImGui::SliderFloat("slider", &f, -100, 100);
+    ImGui::SliderFloat("slider", &f, -100, 100);
+    //ImGui::SliderFloat("slider2", &f, -100, 100);
     //ImGui::DragFloat("drag", &f, 1.0f, -100, 100);
     //ImGui::InputFloat("input", &f, 1.0f);
-    ImGui::TextWrapped("f: %f", f);
+    ImGui::Text("f: %f", f);
     if (disabled) ImGui::EndDisabled();
+
+    ImGuiContext& g = *GImGui;
+    int last = g.LastItemData.ID, hover = g.HoveredId, active = g.ActiveId;
 
     ModifyItemValueByScroll(&f);
 
-    // the spawned text affects it!
+    // the spawned text affects it?
     if (query2 && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
         ImGui::BulletText("hovered... 2");
     }
-    if (query2 && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-        ImGui::BulletText("hovered... 3");
-    }
+    //ImGui::SliderFloat("slider3", &f, -100, 100);
+
+    // draw ids
+    ImGui::SeparatorText("Ids");
+    ImGui::BulletText("val Id %d", last);
+    ImGui::BulletText("val HOVER Id %d", hover);
+    ImGui::BulletText("val ACTIV Id %d", active);
+
+    // ALL
+    ImGui::SeparatorText("ALL");
+    ImGui::SliderFloat("slider", &f, -100, 100);
+    ModifyItemValueByScroll(&f);
+    ImGui::SliderFloat("slider2", &f, -100, 100);
+    ModifyItemValueByScroll(&f);
+    ImGui::DragFloat("drag", &f, 1.0f, -100, 100);
+    ModifyItemValueByScroll(&f);
+    ImGui::InputFloat("input", &f, 1.0f);
+    ModifyItemValueByScroll(&f);
+    ImGui::Text("f: %f", f);
+    ModifyItemValueByScroll(&f);
+    ModifyItemValueByScroll(&f);
 
     // simlate scrollable
+    ImGui::SeparatorText("fill");
     for (size_t i = 0; i < 10; i++) ImGui::TextDisabled("...");
     ImGui::End();
 }
