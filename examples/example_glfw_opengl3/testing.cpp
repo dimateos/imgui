@@ -257,3 +257,56 @@ void test_disabled_hover(int k = 0, bool start_open = true)
 
     ImGui::End();
 }
+
+void issue_begin_end()
+{
+    auto HelpMarker = [&](const char* desc, const char* prefix, bool tooltip, bool sameline) {
+        ImGui::BeginDisabled();
+        bool cancelDisabled = false;
+
+        if (sameline) ImGui::SameLine();
+
+        if (tooltip) {
+            //TextDisabled(prefix); // follows its own style color instead of just alpha mod
+            ImGui::Text("%s", prefix);
+
+            // alternative version that has already set delay etc
+            //ImGui::SetItemTooltip("%s", desc);
+            //if (false) {
+
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                //cancelDisabled = true; ImGui::EndDisabled(); // OK:: end before child ok
+
+                ImGui::BeginTooltip();
+                //ImGui::BeginChild("Child");
+
+                //cancelDisabled = true; ImGui::EndDisabled(); // CRASH:: end disable inside the tooltip
+
+                ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+                ImGui::TextUnformatted(desc);
+                ImGui::PopTextWrapPos();
+
+                ImGui::EndTooltip();
+                //ImGui::EndChild();
+            }
+        }
+        else {
+            ImGui::TextWrapped("%s %s", prefix, desc);
+        }
+        if (!cancelDisabled) ImGui::EndDisabled();
+    };
+
+    static bool tooltip = true, sameline = true;
+
+    ImGui::Begin("TEST ISSUE");
+    {
+        ImGui::Button("Button");
+        HelpMarker("Helpmaker in action", "(?)", tooltip, sameline);
+
+        ImGui::Spacing();
+        ImGui::SeparatorText("Config");
+        ImGui::Checkbox("tooltip", &tooltip);
+        ImGui::Checkbox("sameline", &sameline);
+    }
+    ImGui::End();
+}

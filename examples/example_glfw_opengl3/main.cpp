@@ -190,50 +190,8 @@ int main(int, char**)
         test_value_scroll(ImGuiKey_3);
         test_disabled_hover(ImGuiKey_4, false);
 
-                // TEST ISSUE CODE: includes vscode tasks, etc -> open issue/PR without those
-        {
-            // ref: demo - extended for customization
-            auto HelpMarker = [&](const char* desc, const char* prefix, bool tooltip, bool sameline) {
-                ImGui::BeginDisabled();
-                bool cancelDisabled = false;
-                if (sameline) ImGui::SameLine();
-                if (tooltip) {
-                    //TextDisabled(prefix); // follows its own style color instead of just alpha mod
-                    ImGui::Text(prefix);
-                    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                        //ImGui::EndDisabled(); // OK:: end before child ok
-                        //ImGui::BeginTooltip();
-                        ImGui::BeginChild("Child");
-                        ImGui::EndDisabled(); // CRASH:: end disable inside the tooltip
-                        cancelDisabled = true;
-
-                        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-                        ImGui::TextUnformatted(desc);
-                        ImGui::PopTextWrapPos();
-                        //ImGui::EndTooltip();
-                        ImGui::EndChild();
-                    }
-                }
-                else {
-                    ImGui::TextWrapped("%s %s", prefix, desc);
-                }
-                if (!cancelDisabled) ImGui::EndDisabled();
-            };
-
-            static bool tooltip = true, sameline = true;
-
-            ImGui::Begin("TEST ISSUE");
-            {
-                ImGui::Button("Button");
-                HelpMarker("Helpmaker in action", "(?)", tooltip, sameline);
-
-                //ImGui::Spacing();
-                //ImGui::SeparatorText("Config");
-                //ImGui::Checkbox("tooltip", &tooltip);
-                //ImGui::Checkbox("sameline", &sameline);
-            }
-            ImGui::End();
-        }
+        // To open issues...
+        issue_begin_end();
 
 
         // Rendering
