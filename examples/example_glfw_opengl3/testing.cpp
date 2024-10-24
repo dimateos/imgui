@@ -10,7 +10,7 @@
 // TMP:: anything
 #include <iostream>
 void test() {
-    std::cout << "> cmd out hooked?" << std::endl;
+    //std::cout << "> cmd out hooked?" << std::endl;
 }
 
 
@@ -30,7 +30,7 @@ void test_scoped()
     }
 }
 
-// WIP:: scrolling on top a combo box like QT
+// Scrolling on top a combo box like QT -> could be also done for sliders, makes sense for fixed windows with no scroll
 void test_combo_scroll()
 {
     static bool test_combo_scroll_window = true;
@@ -41,25 +41,39 @@ void test_combo_scroll()
 
     static int selected_item = 0;
     const char* items[] = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+    int items_size = IM_ARRAYSIZE(items);
 
-    if (ImGui::BeginCombo("Combo", items[selected_item])) {
-        ImGuiIO& io = ImGui::GetIO();
+    if (ImGui::Combo("Combo", &selected_item, items, items_size)) {
+        // callback when changed should be called when scroll changes it too
+    }
 
-        for (int i = 0; i < IM_ARRAYSIZE(items); i++) {
-            bool is_selected = (selected_item == i);
-            if (ImGui::Selectable(items[i], is_selected))
-                selected_item = i;
-            if (is_selected)
-                ImGui::SetItemDefaultFocus();
-        }
+    // show hover
+    auto combo_hover = ImGui::IsItemHovered();
+    if (combo_hover) ImGui::BulletText("Combo is hovered now...");
 
-        // Scroll combo box when hovered and the mouse wheel is moved
-        if (ImGui::IsItemHovered()) {
-            float scroll_amount = io.MouseWheel;  // Get the mouse wheel delta
-            ImGui::SetScrollY(ImGui::GetScrollY() - scroll_amount * 10.0f);  // Adjust the scroll speed as needed
-        }
+    // show scroll
+    float scroll_delta = ImGui::GetIO().MouseWheel;
+    ImGui::BeginDisabled();
+    ImGui::SliderFloat("wheel", &scroll_delta, 0, 1);
+    ImGui::EndDisabled();
 
-        ImGui::EndCombo();
+    // show min max
+    static float min_scroll_delta = FLT_MAX;
+    static float max_scroll_delta = -FLT_MAX;
+    static float last_non_zero_scroll_delta = 0.0f;
+    if (scroll_delta < min_scroll_delta) min_scroll_delta = scroll_delta;
+    if (scroll_delta > max_scroll_delta) max_scroll_delta = scroll_delta;
+    if (scroll_delta != 0.0f) last_non_zero_scroll_delta = scroll_delta;
+    ImGui::BulletText("Min scroll delta: %.3f", min_scroll_delta);
+    ImGui::BulletText("Max scroll delta: %.3f", max_scroll_delta);
+    ImGui::BulletText("Last non-zero scroll delta: %.3f", last_non_zero_scroll_delta);
+
+    // scroll on hover (flip index)
+    if (combo_hover && scroll_delta != 0.0f) {
+        int dir = scroll_delta > 0.0f ? 1 : -1;
+        selected_item -= dir;
+        if (selected_item < 0) selected_item = 0;
+        else if (selected_item > items_size-1) selected_item = items_size-1;
     }
 
     ImGui::End();
