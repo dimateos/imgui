@@ -182,7 +182,9 @@ int main(int, char**)
         }
 
         // Testing...
+        test();
         test_scoped();
+        test_combo_scroll();
 
         // Rendering
         ImGui::Render();
