@@ -2,7 +2,8 @@
     "name": "ext_imgui",
     "version": "1.0.0",
 
-    //"skip" : true,
+    // can be targeted anyway when requested explicitly
+    "skip" : true,
     //"use_intel" : true,
 
     "configurations": [
