@@ -3287,6 +3287,17 @@ void ImGui::PushStyleColor(ImGuiCol idx, const ImVec4& col)
         g.Style.Colors[idx] = col;
 }
 
+void ImGui::PushStyleColor(ImGuiCol idx, const ImColor& col)
+{
+    ImGuiContext& g = *GImGui;
+    ImGuiColorMod backup;
+    backup.Col = idx;
+    backup.BackupValue = g.Style.Colors[idx];
+    g.ColorStack.push_back(backup);
+    if (g.DebugFlashStyleColorIdx != idx)
+        g.Style.Colors[idx] = col.Value;
+}
+
 void ImGui::PopStyleColor(int count)
 {
     ImGuiContext& g = *GImGui;
