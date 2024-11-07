@@ -30,6 +30,7 @@
             "values": {
                 "LIB_DIRS": "examples/libs/glfw/lib-vc2010-64",
                 "LIBS": [ "glfw3.lib; opengl32.lib; gdi32.lib; shell32.lib" ],
+                "EXE_LINKER_FLAGS": "-NODEFAULTLIB:MSVCRT"
             }
         },
         {
