@@ -1,0 +1,46 @@
+{
+    "name": "ext_imgui",
+    "version": "1.0.0",
+
+    // can be targeted anyway when requested explicitly
+    "skip" : true,
+    //"use_intel" : true,
+
+    "configurations": [
+        {
+            "sources": {
+                "folders": ["./"],
+                "included":  [
+                    "examples/example_glfw_opengl3/main.cpp; backends/imgui_impl_glfw.cpp; backends/imgui_impl_opengl3.cpp;",
+                    "imgui.cpp; imgui_demo.cpp; imgui_draw.cpp; imgui_tables.cpp; imgui_widgets.cpp;"
+                ],
+            },
+            "values": {
+                "INCLUDE_DIRS": [
+                    "./", "backends", "examples/libs/glfw/include",
+                ],
+            }
+        },
+
+        // split libs
+        {
+            "settings": {
+                "os": "Windows",
+            },
+            "values": {
+                "LIB_DIRS": "examples/libs/glfw/lib-vc2010-64",
+                "LIBS": [ "glfw3.lib; opengl32.lib; gdi32.lib; shell32.lib" ],
+                "EXE_LINKER_FLAGS": "-NODEFAULTLIB:MSVCRT"
+            }
+        },
+        {
+            "settings": {
+                "os": "Linux",
+            },
+            "values": {
+                // installed in the system: sudo apt-get install libgl1-mesa-dev libglfw3-dev
+                "LIBS": [ "glfw; GL; dl; pthread" ],
+            }
+        }
+    ]
+}

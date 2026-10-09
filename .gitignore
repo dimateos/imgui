@@ -85,3 +85,29 @@ examples/example_sdl3_opengl3/example_sdl3_opengl3
 examples/example_sdl3_sdlgpu3/example_sdl3_sdlgpu3
 examples/example_sdl3_sdlrenderer3/example_sdl3_sdlrenderer3
 examples/example_sdl3_vulkan/example_sdl3_vulkan
+examples/example_sdl2_sdlrenderer/example_sdl2_sdlrenderer
+
+# MECALUX_SRC
+## IDE
+.vscode/
+
+## branches/etc
+__user*/
+_wiki*/
+
+## logs/tests/tmp
+log*/
+*.log
+__test*/
+*.tar.gz
+*.retry
+
+## cache
+__pycache__/
+
+## build artifacts
+bin/
+build/
+conanfile.py
+CMakeLists.txt
+**/src/version_control

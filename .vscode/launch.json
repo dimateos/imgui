@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    // REF:: https://code.visualstudio.com/docs/cpp/launch-json-reference
+
+    "configurations": [
+
+        // basic debug config
+        {
+            "name": "-D",
+            "type": "cppvsdbg", "request": "launch", "console": "newExternalWindow",
+            //"preLaunchTask": "build",
+
+            "program": "${workspaceFolder}\\examples\\example_glfw_opengl3\\Debug\\example_glfw_opengl3.exe",
+            "cwd": "${workspaceFolder}\\examples",
+            "args": [
+                //"${input:input-path}"
+            ],
+
+            "suppressMultipleSessionWarning": true,
+            "enableDebugHeap": true, // mostly what slows apps when debugging
+            "visualizerFile": "${workspaceFolder}\\misc\\debuggers\\imgui.natvis",
+            //"logging": { "moduleLoad": false, },
+        },
+    ]
+}
